@@ -6,6 +6,9 @@
 %       top left corner
 %   velDir direction of travel from east in range of 0-2*pi
 function simulate_billiards(l, r, startProportion, velDir, n)
+    clc;
+    close all;
+
     Pos = convert_prop_to_xy(l, r, startProportion);
     draw_stadium(l,r);
     hold on
@@ -17,6 +20,8 @@ function simulate_billiards(l, r, startProportion, velDir, n)
         [x, y, velDir] = getNextHitPoint(l, r, x, y, velDir);
         plot(x, y, '.');
         plot([xold, x], [yold, y]);
+        fprintf('iter: %d    X: %.2f    Y: %.2f\n', i, x, y);
+        drawnow;
         pause(.1);
     end
 end

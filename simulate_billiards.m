@@ -17,137 +17,24 @@ function simulate_billiards(l, r, startProportion, velDir, n)
     for i = 1:n
         xold = x; yold = y;
         plot(xold, yold, 'r.');
-        [x, y, velDir] = getNextHitPoint(l, r, x, y, velDir);
+        [x, y, velDir] = get_next_hit_point(l, r, x, y, velDir);
         plot(x, y, '.');
         plot([xold, x], [yold, y]);
         fprintf('iter: %d    X: %.2f    Y: %.2f\n', i, x, y);
         drawnow;
-        pause(.1);
+        pause(.03);
     end
 end
 
-% converts a proportion to x and y position
-% l length of stadium
-% r radius of stadium
-% prop proportion along border from top left corner
-function Pos = convert_prop_to_xy(l, r, prop)
-    Cutoffs = corner_cutoffs(l, r);
-    if (prop <= Cutoffs(1)) % on top straight line
-        propOnSegment = prop/Cutoffs(1);
-        Pos = [propOnSegment * l - l/2, r];
-    elseif (prop <= Cutoffs(2)) % on right semicircle
-        propOnSegment = (prop - Cutoffs(1))/(Cutoffs(2) - Cutoffs(1));
-        angle = pi/2 - propOnSegment * pi; % go from top around to bottom
-        Pos = [r * cos(angle) + l/2, r * sin(angle)];
-    elseif (prop <= Cutoffs(3)) % on bottom line
-        propOnSegment = (prop - Cutoffs(2))/(Cutoffs(3) - Cutoffs(2));
-        Pos = [l/2 - propOnSegment * l, -r];
-    else % assume on left semicircle
-        propOnSegment = (prop - Cutoffs(3))/(Cutoffs(4) - Cutoffs(3));
-        angle = 3 * pi/2 - propOnSegment * pi; % go from bottom around to top
-        Pos = [ r * cos(angle) - l/2, r * sin(angle)];
-    end
 
+% draws the stadium with length (l) and radius (r)
+function draw_stadium(l, r)
+    axis equal;
+    hold on;
+    line([-l/2 l/2], [r, r]);
+    line([-l/2 l/2], [-r, -r]);
+    Theta = linspace(-pi/2, pi/2);
+    plot(r * cos(Theta) + l/2, r * sin(Theta));
+    plot( - r * cos(Theta) - l/2, r * sin(Theta));
+    hold off;
 end
-
-% returns the cutoffs for the corners
-% used to tell when line turns to semicircle
-function Cutoffs = corner_cutoffs(l , r)
-    totalBorder = 2 * l + 2 * pi * r;
-    Cutoffs = [l, l + pi * r, 2 * l + pi * r, totalBorder] ./totalBorder;
-end
-
-% Chops off the decimal points of a number to a suppled number.
-% If no number of decimal places is provided, defaults to 8.
-% @params
-%   n: number of decimal places to cut off
-function res = chop(X, n)
-    switch nargin
-    case 2
-    case 1
-        n = 5;
-    end
-    
-    res = round(X*10^n)/10^n;
-end
-
-% returns the position of the next point that this ball will hit
-function [xnew, ynew, newVelDir] = getNextHitPoint(l, r, xold, yold, velDir)
-    % see x intersection with top line. new point will be (xnew, r)
-    xnew = (r - yold)/tan(velDir) + xold;
-    ynew = r;
-    % if not same point and in line segment
-    if ( (chop(xold) ~= chop(xnew) || chop(yold) ~= chop(ynew)) && (xnew <= l/2 && xnew >= - l/2) )
-        newVelDir = (mod(pi - velDir, 2 * pi));
-        return;
-    end
-    
-    % see x intersection with bottom line. new point will be (xnew, -r)
-    xnew = (-r - yold)/tan(velDir) + xold;
-    ynew = -r;
-    % if not same point and in line segment
-    if ( (chop(xold) ~= chop(xnew) || chop(yold) ~= chop(ynew)) && (xnew <= l/2 && xnew >= - l/2) )
-        newVelDir = (mod(pi - velDir, 2 * pi));
-        return;
-    end
-    
-    % right semicircle
-    dx = cos(velDir);
-    dy = sin(velDir);
-    D = (xold - l/2) * (yold + dy) - (xold - l/2 + dx) * (yold);
-    discriminant = r^2 - D^2;
-    if (discriminant >=0)
-        xnew = D * dy + sign(dy) * dx * sqrt(discriminant);
-        ynew = -D * dx + abs(dy) * sqrt(discriminant);
-        if (xnew > 0 && (chop(xold) ~= chop(xnew+l/2) || chop(yold) ~= chop(ynew)))
-            % need to reflect over xnew, ynew normal direction
-            newVelDir = (2 * atan2(ynew, xnew) - velDir);
-            %newVel = ref_mat(atan2(ynew, xnew)) * [dx;dy];
-            %newVelDir = atan2(newVel(2), newVel(1));
-            xnew = xnew + l/2;
-            return;
-        else
-            xnew = D * dy - sign(dy) * dx * sqrt(discriminant);
-            ynew = -D * dx - abs(dy) * sqrt(discriminant);
-            if (xnew > 0 && (chop(xold) ~= chop(xnew+l/2) || chop(yold) ~= chop(ynew)))
-                % need to reflect over xnew, ynew normal direction
-                newVelDir = (2 * atan2(ynew, xnew) - velDir);
-                xnew = xnew + l/2;
-                return;
-            end
-            
-        end
-    end
-    
-    % now left semicircle
-    D = (xold + l/2) * (yold + dy) - (xold + l/2 + dx) * (yold);
-    discriminant = r^2 - D^2;
-    if (discriminant >=0)
-        xnew = D * dy + sign(dy) * dx * sqrt(discriminant);
-        ynew = -D * dx + abs(dy) * sqrt(discriminant);
-        if (xnew < 0 && (chop(xold) ~= chop(xnew-l/2) || chop(yold) ~= chop(ynew)))
-            % need to reflect over xnew, ynew normal direction
-            newVelDir = (2 * atan2(ynew, xnew) - velDir);
-            xnew = xnew - l/2;
-            return;
-        else
-            xnew = D * dy - sign(dy) * dx * sqrt(discriminant);
-            ynew = -D * dx - abs(dy) * sqrt(discriminant);
-            if (xnew < 0 && (chop(xold) ~= chop(xnew-l/2) || chop(yold) ~= chop(ynew)))
-                % need to reflect over xnew, ynew normal direction
-                newVelDir = (2 * atan2(ynew, xnew) - velDir);
-                xnew = xnew - l/2;
-                return;
-            end
-            
-        end
-    end
-    
-    error('Hey what?')
-    
-end
-
-function M = ref_mat(theta)
-    M = [cos(2 * theta), sin(2 * theta); sin(2 * theta), - cos(2 * theta)];
-end
-

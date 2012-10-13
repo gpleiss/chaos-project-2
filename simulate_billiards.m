@@ -9,10 +9,9 @@ function simulate_billiards(l, r, startProportion, velDir, n)
     clc;
     close all;
 
-    Pos = convert_prop_to_xy(l, r, startProportion);
+    [x y] = convert_prop_to_xy(l, r, startProportion);
     draw_stadium(l,r);
     hold on
-    x = Pos(1); y = Pos(2);
     plot(x, y, 'r.');
     for i = 1:n
         xold = x; yold = y;

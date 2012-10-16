@@ -6,7 +6,7 @@ function [X Y] = convert_prop_to_xy(l, r, prop)
     Cutoffs = corner_cutoffs(l, r);
     if (prop <= Cutoffs(1)) % on top straight line
         propOnSegment = prop/Cutoffs(1);
-        X = propOnSegment * l - l/2
+        X = propOnSegment * l - l/2;
         Y = r;
     elseif (prop <= Cutoffs(2)) % on right semicircle
         propOnSegment = (prop - Cutoffs(1))/(Cutoffs(2) - Cutoffs(1));
@@ -29,6 +29,6 @@ end
 % returns the cutoffs for the corners
 % used to tell when line turns to semicircle
 function Cutoffs = corner_cutoffs(l , r)
-    totalBorder = 2 * l + 2 * pi * r;
+    totalBorder = getStadiumBorderDistance(l,r);
     Cutoffs = [l, l + pi * r, 2 * l + pi * r, totalBorder] ./totalBorder;
 end

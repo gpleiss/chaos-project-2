@@ -29,11 +29,15 @@ function res = play_billiards(l,r)
         if (first_point_set)
             first_point_set = false;
             %disp(['X, Y, X2, Y2 = ', num2str(startX), ',', num2str(startY), ' , ', num2str(C(1,1)), ',' num2str(C(1,2))]);
-            velDir = atan2((C(1,2) - startY), (C(1,1) - startX));
-            color = colors(current_color, :);
-            current_color = mod(current_color + 1, length(colors(:,1))) + 1;
-            simulate_billiards(l,r, [startX startY], velDir, num_simulation, color);
-            
+            if (C(1,2) ~= startY || C(1,1) ~= startX)
+                velDir = atan2((C(1,2) - startY), (C(1,1) - startX));
+                color = colors(current_color, :);
+                current_color = mod(current_color + 1, length(colors(:,1))) + 1;
+                simulate_billiards(l,r, [startX startY], velDir, num_simulation, color);
+            else
+               clf;
+               draw_stadium(l, r);
+            end
         else
             first_point_set = true;
             startX = C(1, 1); startY = C(1, 2);

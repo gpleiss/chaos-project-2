@@ -6,9 +6,9 @@
 %       top left corner
 %   velDir direction of travel from east in range of 0-2*pi
 function simulate_billiards(l, r, startPos, velDir, n, varargin)
-    numvarargs = length(varargin)
+    numvarargs = length(varargin);
     if (numvarargs > 0)
-        color = varargin{1}
+        color = varargin{1};
     else 
         color = 'r';
     end
@@ -19,8 +19,8 @@ function simulate_billiards(l, r, startPos, velDir, n, varargin)
     end
     draw_stadium(l,r);
     hold on
-    xold = x
-    yold = y
+    xold = x;
+    yold = y;
     
     p = plot(x,y);
     pl = plot([xold, x], [yold, y]);

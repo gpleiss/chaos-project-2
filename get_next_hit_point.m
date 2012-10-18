@@ -22,10 +22,10 @@ function [xnew, ynew, newVelDir] = get_next_hit_point(l, r, xold, yold, velDir)
     dx = cos(velDir);
     dy = sin(velDir);
     D = (xold - l/2) * (yold + dy) - (xold - l/2 + dx) * (yold);
-    discriminant = r^2 - D^2;
+    discriminant = r^2 - D^2
     if (discriminant >=0)
-        xnew = D * dy + sign(dy) * dx * sqrt(discriminant);
-        ynew = -D * dx + abs(dy) * sqrt(discriminant);
+        xnew = D * dy + sgn(dy) * dx * sqrt(discriminant)
+        ynew = -D * dx + abs(dy) * sqrt(discriminant)
         if (xnew > 0 && (chop(xold) ~= chop(xnew+l/2) || chop(yold) ~= chop(ynew)))
             % need to reflect over xnew, ynew normal direction
             newVelDir = (2 * atan2(ynew, xnew) - velDir);
@@ -34,7 +34,7 @@ function [xnew, ynew, newVelDir] = get_next_hit_point(l, r, xold, yold, velDir)
             xnew = xnew + l/2;
             return;
         else
-            xnew = D * dy - sign(dy) * dx * sqrt(discriminant);
+            xnew = D * dy - sgn(dy) * dx * sqrt(discriminant);
             ynew = -D * dx - abs(dy) * sqrt(discriminant);
             if (xnew > 0 && (chop(xold) ~= chop(xnew+l/2) || chop(yold) ~= chop(ynew)))
                 % need to reflect over xnew, ynew normal direction
@@ -48,9 +48,9 @@ function [xnew, ynew, newVelDir] = get_next_hit_point(l, r, xold, yold, velDir)
     
     % now left semicircle
     D = (xold + l/2) * (yold + dy) - (xold + l/2 + dx) * (yold);
-    discriminant = r^2 - D^2;
+    discriminant = r^2 - D^2
     if (discriminant >=0)
-        xnew = D * dy + sign(dy) * dx * sqrt(discriminant);
+        xnew = D * dy + sgn(dy) * dx * sqrt(discriminant);
         ynew = -D * dx + abs(dy) * sqrt(discriminant);
         if (xnew < 0 && (chop(xold) ~= chop(xnew-l/2) || chop(yold) ~= chop(ynew)))
             % need to reflect over xnew, ynew normal direction
@@ -58,7 +58,7 @@ function [xnew, ynew, newVelDir] = get_next_hit_point(l, r, xold, yold, velDir)
             xnew = xnew - l/2;
             return;
         else
-            xnew = D * dy - sign(dy) * dx * sqrt(discriminant);
+            xnew = D * dy - sgn(dy) * dx * sqrt(discriminant);
             ynew = -D * dx - abs(dy) * sqrt(discriminant);
             if (xnew < 0 && (chop(xold) ~= chop(xnew-l/2) || chop(yold) ~= chop(ynew)))
                 % need to reflect over xnew, ynew normal direction
@@ -89,6 +89,13 @@ function res = chop(X, n)
     res = round(X*10^n)/10^n;
 end
 
+% does the sgn function, but with no 0
+function res=sgn(x)
+    res = sign(x)
+    if (~res)
+        res = 1;
+    end
+end
 
 % function M = ref_mat(theta)
 %     M = [cos(2 * theta), sin(2 * theta); sin(2 * theta), - cos(2 * theta)];

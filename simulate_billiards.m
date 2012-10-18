@@ -33,8 +33,13 @@ function simulate_billiards(l, r, startPos, velDir, n, varargin)
         pl = plot([xold, x], [yold, y]);
         fprintf('iter: %d    X: %.2f    Y: %.2f\n', i, x, y);
         drawnow;
-        %pause(.03);
+        pause(.5);
     end
     set(p,'Color', color, 'MarkerSize', 15, 'Marker', 's', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', color);
     set(pl,'Color', color);
 end
+
+% 4 cycle - simulate_billiards(2, 1, 1/(2*pi + 4), atan(1/2), 10)
+% 6 cycle - simulate_billiards(2, 1, 1/(2*pi + 4), atan((1+sqrt(3)/2)/1.5), 10)
+% 6 cycle - simulate_billiards(2, 1, 0, pi/4, 10)
+
